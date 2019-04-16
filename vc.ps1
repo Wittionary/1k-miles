@@ -1,5 +1,6 @@
 # First two measures
 # HiB B HiB HiA B HiA HiF -- D C B ???
+# http://www.words3music.ph/sheets/VanessaCarlton-AThousandMiles.pdf
 # https://en.wikipedia.org/wiki/Scientific_pitch_notation#Table_of_note_frequencies
 # Going up an octave increases freq by x2
 # Going down an octave decreases note freq by .5
