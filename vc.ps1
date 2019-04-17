@@ -9,6 +9,7 @@
 # Just make function for notes instead of hardcoding
 
 $C4 = 261.63
+$A4 = 440
 function Get-Distance { }
 function Get-NoteFrequency {
     Param ([string]$letter, [int]$number)
@@ -17,11 +18,15 @@ function Get-NoteFrequency {
     $letter = $letter.ToUpper()
     $letter = $letter -replace '\s', ''
 
-    "C","CSHARP", "DFLAT", "D", "DSHARP",
-    "EFLAT", "E", "F", "FSHARP", "GFLAT",
-    "G", "GSHARP", "AFLAT", "A", "ASHARP",
-    "BFLAT", "B"
+    $noteList = @("C","CSHARP", "DFLAT", "D", "DSHARP",
+                "EFLAT", "E", "F", "FSHARP", "GFLAT",
+                "G", "GSHARP", "AFLAT", "A", "ASHARP",
+                "BFLAT", "B")
 
+    $octaveDifference = $number - 4
+    $semitonesDifference = $octaveDifference * 12
+    
+    
     return $frequency
 
 }
