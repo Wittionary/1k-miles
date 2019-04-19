@@ -10,7 +10,6 @@
 
 $C4 = 261.63
 $A4 = 440
-function Get-Distance { }
 function Get-NoteFrequency {
     Param ([string]$letter, [int]$number)
 
@@ -47,7 +46,7 @@ function Get-NoteFrequency {
          
  
 
-    $octaveDifference = $number - 4 # num of times to loop
+    $octaveDifference = $number - 4 # num of times and direction to loop
     $semitonesDifference = 0
 
     Write-Host "53"
@@ -64,31 +63,13 @@ function Get-NoteFrequency {
     } else {
         # it's 0
     }
+
     Write-Host "start calc"
-    $frequency = 440 * [math]::pow(2,(($semitonesDifference - 9)/12))
+    $frequency = $A4 * [math]::pow(2,(($semitonesDifference - 9)/12))
     Write-Host "end func"
     return $frequency
 
 }
-# ----- x4
-$C4=261.63
-$Cs4=277.2
-$Db4=$Cs4
-$D4=293
-$Ds4=311.1
-$Eb4=$Ds4
-$E4=329.6
-$F4=349.2
-$Fs4=370.0
-$Gb4=$Fs4
-$G4=392.0
-$Gs4=415.3
-$Ab4=$Gs4
-$A4=440
-$As4=466.1
-$Bb4=$As4
-$B4=493.9
-
 
 $duration=2000 #1 sec
 
