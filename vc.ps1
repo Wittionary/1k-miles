@@ -13,20 +13,55 @@ $A4 = 440
 function Get-Distance { }
 function Get-NoteFrequency {
     Param ([string]$letter, [int]$number)
-    $letter = $letter -replace '#', 'sharp'
-    # replace 'b' with 'flat' if it's not the only letter in the string
-    $letter = $letter.ToUpper()
-    $letter = $letter -replace '\s', ''
 
-    $noteList = @("C","CSHARP", "DFLAT", "D", "DSHARP",
+    # add stuff like ESHARP = F etc.
+    $validNoteList = @("C","CSHARP", "DFLAT", "D", "DSHARP",
                 "EFLAT", "E", "F", "FSHARP", "GFLAT",
                 "G", "GSHARP", "AFLAT", "A", "ASHARP",
                 "BFLAT", "B")
 
-    $octaveDifference = $number - 4
-    $semitonesDifference = $octaveDifference * 12
+    $noteList = @("C","CSHARP", "D", "DSHARP",
+     "E", "F", "FSHARP",
+    "G", "GSHARP", "A", "ASHARP", "B")
+
+    $letter = $letter -replace '#', 'sharp'
+
+    if ($letter.Length -gt 1){ # replace 'b' with 'flat' if it's not the only letter in the string
+        $letter = $letter -replace 'b', 'flat'
+    }
     
+    $letter = $letter.ToUpper()
+    $letter = $letter -replace '\s', ''
+
+    # Did the user enter a valid note letter?
+    if (-Not $validNoteList.Contains($letter)){
+        # Write error to console "not a valid note value"
+        return
+    } elseif ($number -lt 0 -or $number -gt 10) {
+        # Write error to console "invalid octave. try 1 through 10"
+        return
+    }
+         
+ 
+
+    $octaveDifference = $number - 4 # num of times to loop
+    $semitonesDifference = 0
+
+    if ($octaveDifference -gt 0){
+        # count up
+        for ($note -in $noteList){#this doesn't yet account for looping through the array multiple times
+            $octaveDifference++ 
+            if ($note -eq $letter){
+                break
+            }
+        }
+    } elseif ($octaveDifference -lt 0) {
+        # count down
+    } else {
+        # it's 0
+    }
     
+    $frequency = 440 * (2^($semitonesDifference-9)/12)
     return $frequency
 
 }
@@ -50,9 +85,9 @@ $Bb4=$As4
 $B4=493.9
 
 
-$duration=1000 #1 sec
+$duration=2000 #1 sec
 
 
-[console]::beep($C*2,$duration)
+[console]::beep((Get-NoteFrequency "C" 5),$duration)
 [console]::beep($D*2,$duration)
 
