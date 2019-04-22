@@ -71,7 +71,7 @@ function Get-NoteFrequency {
 
 }
 
-$duration=2000 #1 sec
+$duration=2000 #in milliseconds
 
 Write-Host "start beeps"
 [console]::beep((Get-NoteFrequency "d" 5),$duration)
