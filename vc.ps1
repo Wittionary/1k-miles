@@ -1,5 +1,5 @@
 # First two measures
-# HiB B HiB HiA B HiA HiF -- D C B ???
+# https://www.musicnotes.com/sheetmusic/mtd.asp?ppn=MN0043758
 # http://www.words3music.ph/sheets/VanessaCarlton-AThousandMiles.pdf
 # https://en.wikipedia.org/wiki/Scientific_pitch_notation#Table_of_note_frequencies
 # Going up an octave increases freq by x2
@@ -13,67 +13,80 @@ $A4 = 440
 function Get-NoteFrequency {
     Param ([string]$letter, [int]$number)
 
-    Write-Host "start func"
     # add stuff like ESHARP = F etc.
-    $validNoteList = @("C","CSHARP", "DFLAT", "D", "DSHARP",
-                "EFLAT", "E", "F", "FSHARP", "GFLAT",
-                "G", "GSHARP", "AFLAT", "A", "ASHARP",
-                "BFLAT", "B")
+    $validNoteList = @("C", "CSHARP", "DFLAT", "D", "DSHARP",
+        "EFLAT", "E", "F", "FSHARP", "GFLAT",
+        "G", "GSHARP", "AFLAT", "A", "ASHARP",
+        "BFLAT", "B")
 
-    $noteList = @("C","CSHARP", "D", "DSHARP",
-     "E", "F", "FSHARP",
-    "G", "GSHARP", "A", "ASHARP", "B")
+    $noteList = @("C", "CSHARP", "D", "DSHARP",
+        "E", "F", "FSHARP",
+        "G", "GSHARP", "A", "ASHARP", "B")
 
     $letter = $letter -replace '#', 'sharp'
 
-    Write-Host "30"
-    if ($letter.Length -gt 1){ # replace 'b' with 'flat' if it's not the only letter in the string
+    if ($letter.Length -gt 1) {
+        # replace 'b' with 'flat' if it's not the only letter in the string
         $letter = $letter -replace 'b', 'flat'
     }
     
     $letter = $letter.ToUpper()
     $letter = $letter -replace '\s', ''
 
-    Write-Host "38"
     # Did the user enter a valid note letter?
-    if (-Not $validNoteList.Contains($letter)){
+    if (-Not $validNoteList.Contains($letter)) {
         # Write error to console "not a valid note value"
         return
-    } elseif ($number -lt 0 -or $number -gt 10) {
+    }
+    elseif ($number -lt 0 -or $number -gt 10) {
         # Write error to console "invalid octave. try 1 through 10"
         return
     }
+    # Add case for non-integer being entered
          
  
 
     $octaveDifference = $number - 4 # num of times and direction to loop
     $semitonesDifference = 0
 
-    Write-Host "53"
-    if ($octaveDifference -gt 0){
+    if ($octaveDifference -gt 0) {
         # count up
-        foreach ($note in $noteList){#this doesn't yet account for looping through the array multiple times
+        foreach ($note in $noteList) {
+            #this doesn't yet account for looping through the array multiple times
             $semitonesDifference++ 
-            if ($note -eq $letter){
+            if ($note -eq $letter) {
                 break
             }
         }
-    } elseif ($octaveDifference -lt 0) {
+    }
+    elseif ($octaveDifference -lt 0) {
         # count down
-    } else {
+    }
+    else {
         # it's 0
     }
 
-    Write-Host "start calc"
-    $frequency = $A4 * [math]::pow(2,(($semitonesDifference - 9)/12))
-    Write-Host "end func"
+
+    $frequency = $A4 * [math]::pow(2, (($semitonesDifference - 9) / 12))
     return $frequency
 
 }
 
-$duration=2000 #in milliseconds
+function Invoke-NoteFrequency {
+    Param ([int]$frequency, [int]$duration = 1000)
+    #add: receive freq from pipeline
+    
+    [console]::beep($frequency, $duration)
+}
+$duration = 2000 #in milliseconds
 
+# https://www.musicnotes.com/sheetmusic/mtd.asp?ppn=MN0043758
+# https://www.hooktheory.com/theorytab/view/vanessa-carlton/a-thousand-miles
+Measure 1: b6, b5, b6, asharp6, b5, asharp6, fsharp6 long, dsharp6, csharp6, b5
+Measure 2: b6, b5, b6, asharp6, b5, asharp6, fsharp6, b5, fsharp6, b5, fsharp6, b5, dsharp6, e6, dsharp6, csharp6
+Measure 3 = Measure 1
+Measure 4: dsharp6, csharp6, b5,dsharp6, csharp6, b5, fsharp6 long, csharp6
 Write-Host "start beeps"
-[console]::beep((Get-NoteFrequency "d" 5),$duration)
-[console]::beep((Get-NoteFrequency "b" 5), $duration)
+Invoke-NoteFrequency -frequency (Get-NoteFrequency "d" 5) -duration $duration
+
 Write-Host "end beeps"
