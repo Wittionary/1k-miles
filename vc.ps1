@@ -11,7 +11,9 @@
 $C4 = 261.63
 $A4 = 440
 function Get-NoteFrequency {
-    Param ([string]$letter, [int]$number)
+    Param (
+        [string]$letterAndNumber
+    )
 
     # add stuff like ESHARP = F etc.
     $validNoteList = @("C", "CSHARP", "DFLAT", "D", "DSHARP",
@@ -22,6 +24,12 @@ function Get-NoteFrequency {
     $noteList = @("C", "CSHARP", "D", "DSHARP",
         "E", "F", "FSHARP",
         "G", "GSHARP", "A", "ASHARP", "B")
+
+    #take the number off the end of the string so you can split up the LETTER and NUMBER into two different values
+    $letter = $letterAndNumber.Substring(0, ($letterAndNumber.Length - 1))
+    $number = $letterAndNumber.Substring(($letterAndNumber.Length - 1), 1)
+    $number = $number -as [int]
+    Write-Host "letter: $letter `nnumber: $number"
 
     $letter = $letter -replace '#', 'sharp'
 
@@ -35,11 +43,12 @@ function Get-NoteFrequency {
 
     # Did the user enter a valid note letter?
     if (-Not $validNoteList.Contains($letter)) {
-        # Write error to console "not a valid note value"
+        Write-Error "$Letter is not a valid note value."
         return
     }
     elseif ($number -lt 0 -or $number -gt 10) {
         # Write error to console "invalid octave. try 1 through 10"
+        Write-Error "$number is an invalid octave. Use an integer 1 through 10."
         return
     }
     # Add case for non-integer being entered
@@ -66,27 +75,31 @@ function Get-NoteFrequency {
         # it's 0
     }
 
-
+    write-host "Get-Note semitonesDifference: $semitonesDifference"
     $frequency = $A4 * [math]::pow(2, (($semitonesDifference - 9) / 12))
+    write-host "Get-Note Frequency: $frequency"
     return $frequency
 
 }
 
-function Invoke-NoteFrequency {
-    Param ([int]$frequency, [int]$duration = 1000)
+function Invoke-Note {
+    Param (
+        [int]$frequency, 
+        [int]$duration = 1000
+    )
     #add: receive freq from pipeline
-    
+    write-host "Invoke-Note Frequency: $frequency"
     [console]::beep($frequency, $duration)
 }
 $duration = 2000 #in milliseconds
 
 # https://www.musicnotes.com/sheetmusic/mtd.asp?ppn=MN0043758
 # https://www.hooktheory.com/theorytab/view/vanessa-carlton/a-thousand-miles
-Measure 1: b6, b5, b6, asharp6, b5, asharp6, fsharp6 long, dsharp6, csharp6, b5
-Measure 2: b6, b5, b6, asharp6, b5, asharp6, fsharp6, b5, fsharp6, b5, fsharp6, b5, dsharp6, e6, dsharp6, csharp6
-Measure 3 = Measure 1
-Measure 4: dsharp6, csharp6, b5,dsharp6, csharp6, b5, fsharp6 long, csharp6
+$measure1 = @("b6", "b5", "b6", "asharp6", "b5", "asharp6", "fsharp6" <#long#>, "dsharp6", "csharp6", "b5")
+$measure2 = @("b6", "b5", "b6", "asharp6", "b5", "asharp6", "fsharp6", "b5", "fsharp6", "b5", "fsharp6", "b5", "dsharp6", "e6", "dsharp6", "csharp6")
+$measure3 = $measure1
+$measure4 = @("dsharp6", "csharp6", "b5", "dsharp6", "csharp6", "b5", "fsharp6" <#long#>, "csharp6")
 Write-Host "start beeps"
-Invoke-NoteFrequency -frequency (Get-NoteFrequency "d" 5) -duration $duration
+Invoke-Note -frequency (Get-NoteFrequency "dsharp5") -duration $duration
 
 Write-Host "end beeps"
