@@ -12,24 +12,24 @@ $C4 = 261.63
 $A4 = 440
 function Get-NoteFrequency {
     Param (
-        [string]$letterAndNumber
+        [string]$LetterAndNumber
     )
 
     # add stuff like ESHARP = F etc.
-    $validNoteList = @("C", "CSHARP", "DFLAT", "D", "DSHARP",
+    $ValidNoteList = @("C", "CSHARP", "DFLAT", "D", "DSHARP",
         "EFLAT", "E", "F", "FSHARP", "GFLAT",
         "G", "GSHARP", "AFLAT", "A", "ASHARP",
         "BFLAT", "B")
 
-    $noteList = @("C", "CSHARP", "D", "DSHARP",
+    $NoteList = @("C", "CSHARP", "D", "DSHARP",
         "E", "F", "FSHARP",
         "G", "GSHARP", "A", "ASHARP", "B")
 
     #take the number off the end of the string so you can split up the LETTER and NUMBER into two different values
-    $letter = $letterAndNumber.Substring(0, ($letterAndNumber.Length - 1))
-    $number = $letterAndNumber.Substring(($letterAndNumber.Length - 1), 1)
-    $number = $number -as [int]
-    Write-Host "letter: $letter `nnumber: $number"
+    $letter = $LetterAndNumber.Substring(0, ($LetterAndNumber.Length - 1))
+    $Number = $LetterAndNumber.Substring(($LetterAndNumber.Length - 1), 1)
+    $Number = $Number -as [int]
+    #Write-Host "letter: $letter `nnumber: $Number"
 
     $letter = $letter -replace '#', 'sharp'
 
@@ -42,25 +42,25 @@ function Get-NoteFrequency {
     $letter = $letter -replace '\s', ''
 
     # Did the user enter a valid note letter?
-    if (-Not $validNoteList.Contains($letter)) {
+    if (-Not $ValidNoteList.Contains($letter)) {
         Write-Error "$Letter is not a valid note value."
         return
     }
-    elseif ($number -lt 0 -or $number -gt 10) {
+    elseif ($Number -lt 0 -or $Number -gt 10) {
         # Write error to console "invalid octave. try 1 through 10"
-        Write-Error "$number is an invalid octave. Use an integer 1 through 10."
+        Write-Error "$Number is an invalid octave. Use an integer 1 through 10."
         return
     }
     # Add case for non-integer being entered
          
  
 
-    $octaveDifference = $number - 4 # num of times and direction to loop
+    $OctaveDifference = $Number - 4 # num of times and direction to loop
     $semitonesDifference = 0
 
-    if ($octaveDifference -gt 0) {
+    if ($OctaveDifference -gt 0) {
         # count up
-        foreach ($note in $noteList) {
+        foreach ($note in $NoteList) {
             #this doesn't yet account for looping through the array multiple times
             $semitonesDifference++ 
             if ($note -eq $letter) {
@@ -68,38 +68,82 @@ function Get-NoteFrequency {
             }
         }
     }
-    elseif ($octaveDifference -lt 0) {
+    elseif ($OctaveDifference -lt 0) {
         # count down
     }
     else {
         # it's 0
     }
 
-    write-host "Get-Note semitonesDifference: $semitonesDifference"
-    $frequency = $A4 * [math]::pow(2, (($semitonesDifference - 9) / 12))
-    write-host "Get-Note Frequency: $frequency"
-    return $frequency
-
+    $Frequency = $A4 * [math]::pow(2, (($semitonesDifference - 9) / 12))
+    return $Frequency
 }
 
 function Invoke-Note {
     Param (
-        [int]$frequency, 
-        [int]$duration = 1000
+        [Parameter(ValueFromPipeline = $true)]
+        [int]$Frequency, 
+        [int]$Duration = 110
     )
-    #add: receive freq from pipeline
-    write-host "Invoke-Note Frequency: $frequency"
-    [console]::beep($frequency, $duration)
+    #write-host "Invoke-Note Frequency: $Frequency"
+    [console]::beep($Frequency, $Duration)
 }
-$duration = 2000 #in milliseconds
+
+function Invoke-Measure {
+    Param (
+        [Parameter(Mandatory=$true)]
+        [array]
+        $Measure
+    )
+
+    foreach ($Note in $Measure) {
+        Get-NoteFrequency -LetterAndNumber $Note.Note | Invoke-Note -Duration $Note.Duration
+    }
+}
 
 # https://www.musicnotes.com/sheetmusic/mtd.asp?ppn=MN0043758
 # https://www.hooktheory.com/theorytab/view/vanessa-carlton/a-thousand-miles
-$measure1 = @("b6", "b5", "b6", "asharp6", "b5", "asharp6", "fsharp6" <#long#>, "dsharp6", "csharp6", "b5")
-$measure2 = @("b6", "b5", "b6", "asharp6", "b5", "asharp6", "fsharp6", "b5", "fsharp6", "b5", "fsharp6", "b5", "dsharp6", "e6", "dsharp6", "csharp6")
-$measure3 = $measure1
-$measure4 = @("dsharp6", "csharp6", "b5", "dsharp6", "csharp6", "b5", "fsharp6" <#long#>, "csharp6")
-Write-Host "start beeps"
-Invoke-Note -frequency (Get-NoteFrequency "dsharp5") -duration $duration
+# --------------------------------------- INTRO ---------------------------------------
+$measure1 = @(@{note="b6";duration="110"},
+            @{note="b5";duration="110"},
+            @{note="b6";duration="110"},
+            @{note="asharp6";duration="110"},
+            @{note="b5";duration="110"},
+            @{note="asharp6";duration="110"},
+            @{note="fsharp6";duration="600" },
+            @{note="dsharp6";duration="200"},
+            @{note="csharp6";duration="110"},
+            @{note="b5";duration="110"})
 
-Write-Host "end beeps"
+$measure2 = @(@{note="b6";duration="110"},
+            @{note="b5";duration="110"},
+            @{note="b6";duration="110"},
+            @{note="asharp6";duration="110"},
+            @{note="b5";duration="110"},
+            @{note="asharp6";duration="110"},
+            @{note="fsharp6";duration="110"},
+            @{note="b5";duration="110"},
+            @{note="fsharp6";duration="110"},
+            @{note="b5";duration="110"},
+            @{note="fsharp6";duration="110"},
+            @{note="b5";duration="110"},
+            @{note="dsharp6";duration="110"},
+            @{note="e6";duration="110"},
+            @{note="dsharp6";duration="110"},
+            @{note="csharp6";duration="110"})
+
+$measure3 = $measure1
+$measure4 = @(@{note="dsharp6";duration="110"},
+            @{note="csharp6";duration="110"},
+            @{note="b5";duration="110"},
+            @{note="dsharp6";duration="110"},
+            @{note="csharp6";duration="110"},
+            @{note="b5";duration="110"},
+            @{note="fsharp6";duration="400"},
+            @{note="csharp6";duration="400"})
+
+
+Invoke-Measure -Measure $measure1
+Invoke-Measure -Measure $measure2
+Invoke-Measure -Measure $measure3
+Invoke-Measure -Measure $measure4
