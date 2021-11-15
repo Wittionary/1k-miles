@@ -2,7 +2,7 @@
 # https://www.musicnotes.com/sheetmusic/mtd.asp?ppn=MN0043758
 # https://www.hooktheory.com/theorytab/view/vanessa-carlton/a-thousand-miles
 
-Import-Module -Name .\make-music.ps1 -Force
+Import-Module -Name .\make-music.psm1 -Force
 
 # --------------------------------------- INTRO ---------------------------------------
 $measure1 = @(@{note = "b6"; duration = "110" },
